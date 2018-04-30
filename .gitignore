@@ -1,0 +1,9 @@
+# dependencies
+node_modules
+
+# logs
+npm-debug.log
+
+# data
+data/*
+!data/README.md

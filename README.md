@@ -1,1 +1,11 @@
-"# related-subreddits" 
+"# related-subreddits"
+
+```
+npm install
+
+
+npm download
+
+
+npm start
+```

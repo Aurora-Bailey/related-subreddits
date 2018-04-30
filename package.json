@@ -1,0 +1,23 @@
+{
+  "name": "related-subreddits",
+  "version": "1.0.0",
+  "description": "\"# related-subreddits\"",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --max-old-space-size=131072 index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbradthompson/related-subreddits.git"
+  },
+  "author": "Brad Thompson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gbradthompson/related-subreddits/issues"
+  },
+  "homepage": "https://github.com/gbradthompson/related-subreddits#readme",
+  "dependencies": {
+    "aws-sdk": "^2.229.1"
+  }
+}
