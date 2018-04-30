@@ -1,6 +1,11 @@
 const fs = require('fs')
 const path = require('path')
 
+function memoryUsed () {
+  const used = process.memoryUsage().heapUsed / 1024 / 1024
+  console.log(`The script uses approximately ${used} MB`)
+}
+
 let now = Date.now()
 function stopwatch () {
   let then = now
@@ -56,6 +61,7 @@ function processChunk (chunk) {
     author_object[a_c][author].sub.push(subreddit_object[s_c][subreddit])
 
   })
+  memoryUsed()
   console.log('==================== Chunk Time:', stopwatch(), '====================')
 }
 
