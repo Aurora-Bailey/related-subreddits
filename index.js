@@ -119,6 +119,7 @@ function testLoopSpeed () {
 
 let comment_minimum = 1000
 function crunch () {
+  let count = 0
   let response_array = []
 
   console.log('######################### Write index #########################')
@@ -130,6 +131,7 @@ function crunch () {
     sub_cmt.push(sub.cmt)
   })
   console.log(sub_list.length)
+  let total_subreddits = sub_list.length
   response_array.push({sub: '_index_subreddits', data: JSON.stringify({length: sub_list.length, list: sub_list, cmt: sub_cmt})})
 
   console.log('######################### Start the crunch #########################')
@@ -152,8 +154,9 @@ function crunch () {
       }
 
     })
+    count++
     response_array.push({sub: sub.nm, data: JSON.stringify(response)})
-    console.log(sub.nm, stopwatch())
+    console.log(count + '/' + total_subreddits, stopwatch(), sub.nm)
   })
   return response_array
 }
