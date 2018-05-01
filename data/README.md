@@ -23,10 +23,6 @@ Sally,videos
 Download from AWS S3 (Oregon West)
 
 ```
-npm download
-
-OR
-
 wget -P ./data/ "https://s3-us-west-2.amazonaws.com/noros/author_subreddits_all_000000000000";
 wget -P ./data/ "https://s3-us-west-2.amazonaws.com/noros/author_subreddits_all_000000000001";
 wget -P ./data/ "https://s3-us-west-2.amazonaws.com/noros/author_subreddits_all_000000000002";

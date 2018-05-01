@@ -166,7 +166,7 @@ function writeAll (response_array) {
 console.log('######################### Start #########################')
 
 // Load from file
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 24; i++) {
   loadChunk(i)
 }
 
