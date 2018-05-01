@@ -117,7 +117,7 @@ function testLoopSpeed () {
   console.log('Author array empty loop:', stopwatch())
 }
 
-let comment_minimum = 50000
+let comment_minimum = 10000
 function crunch () {
   let response_array = []
 
