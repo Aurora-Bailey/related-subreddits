@@ -123,12 +123,14 @@ function crunch () {
 
   console.log('######################### Write index #########################')
   let sub_list = []
+  let sub_cmt = []
   loopThroughSubredditsArray(sub => {
     if (sub.cmt < comment_minimum) return false
     sub_list.push(sub.nm)
+    sub_cmt.push(sub.cmt)
   })
   console.log(sub_list.length)
-  response_array.push({sub: '_index_subreddits', data: JSON.stringify({length: sub_list.length, list: sub_list})})
+  response_array.push({sub: '_index_subreddits', data: JSON.stringify({length: sub_list.length, list: sub_list, cmt: sub_cmt})})
 
   console.log('######################### Start the crunch #########################')
   loopThroughSubredditsArray(sub => {
