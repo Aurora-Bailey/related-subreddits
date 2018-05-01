@@ -119,8 +119,18 @@ function testLoopSpeed () {
 
 let comment_minimum = 50000
 function crunch () {
-  console.log('######################### Start the crunch #########################')
   let response_array = []
+
+  console.log('######################### Write index #########################')
+  let sub_list = []
+  loopThroughSubredditsArray(sub => {
+    if (sub.cmt < comment_minimum) return false
+    sub_list.push(sub.nm)
+  })
+  console.log(sub_list.length)
+  response_array.push({sub: '_index_subreddits', data: JSON.stringify({length: sub_list.length, list: sub_list})})
+
+  console.log('######################### Start the crunch #########################')
   loopThroughSubredditsArray(sub => {
     if (sub.cmt < comment_minimum) return false
     let response = {subreddit: sub.nm, c: sub.cmt, x_subs: {}}
