@@ -1,5 +1,31 @@
 const fs = require('fs')
 const path = require('path')
+const AWS = require('aws-sdk')
+const s3 = new AWS.S3()
+
+function createS3Bucket () {
+  return new Promise((resolve, reject) => {
+    let bucketName = "related-subreddits-" + Math.floor(Math.random() * 1e8)
+    console.log('######################### Create new bucket #########################')
+    console.log(bucketName)
+    s3.createBucket({Bucket: bucketName}, function(err, data) {
+      if (err) reject(err)
+      else resolve(bucketName)
+    })
+  })
+}
+
+function writeS3Bucket (bucket, name, data) {
+  return new Promise((resolve, reject) => {
+    params = {Bucket: bucket, Key: name, Body: data}
+    console.log('write ', name)
+    s3.putObject(params, function(err, data) {
+      console.log('saved ', name)
+      if (err) reject(err)
+      else resolve()
+    })
+  })
+}
 
 function memoryUsed () {
   const used = process.memoryUsage().heapUsed / 1024 / 1024
@@ -62,7 +88,7 @@ function processChunk (chunk) {
 
   })
   memoryUsed()
-  console.log('==================== Chunk Time:', stopwatch(), '====================')
+  console.log('######################### Chunk Time:', stopwatch(), '#########################')
 }
 
 // { nm: 'SaintPoitiersbourg', cmt: 2 }
@@ -83,49 +109,72 @@ function loopThroughAuthorsArray (processFunction) {
   })
 }
 
-function writeToFile (name, data) {
-  // fs.writeFileSync(path.resolve('./out/' + name + '.json'), JSON.stringify(data))
+function testLoopSpeed () {
+  console.log('######################### Test Loop Speed #########################')
+  loopThroughSubredditsArray(sub => {})
+  console.log('Subreddit array empty loop:', stopwatch())
+  loopThroughAuthorsArray(author => {})
+  console.log('Author array empty loop:', stopwatch())
 }
 
+let comment_minimum = 50000
+function crunch () {
+  console.log('######################### Start the crunch #########################')
+  let response_array = []
+  loopThroughSubredditsArray(sub => {
+    if (sub.cmt < comment_minimum) return false
+    let response = {subreddit: sub.nm, c: sub.cmt, x_subs: {}}
+    loopThroughAuthorsArray(author => {
+      let match = false
+      author.sub.forEach(sr => {
+        if (sub == sr) match = true
+      })
+
+      if (match) {
+        author.sub.forEach(sr => {
+          if (sr.cmt < comment_minimum) return false
+          if (sr == sub) return false
+          if (typeof response.x_subs[sr.nm] !== 'object') response.x_subs[sr.nm] = {x: 0, c: sr.cmt}
+          response.x_subs[sr.nm].x++
+        })
+      }
+
+    })
+    response_array.push({sub: sub.nm, data: JSON.stringify(response)})
+    console.log(sub.nm, stopwatch())
+  })
+  return response_array
+}
+
+function writeAll (response_array) {
+  return new Promise((resolve, reject) => {
+    createS3Bucket().catch(err => reject(err)).then(bucket => {
+      console.log('######################### Upload to S3 #########################')
+      let sent = 0
+      let sending = response_array.length
+      response_array.forEach(response => {
+        writeS3Bucket(bucket, '' + response.sub + '.json', response.data).catch(err => {reject(err)}).then(() => {
+          sent++
+          if (sending == sent) resolve()
+        })
+      })
+    })
+  })
+}
+
+// Start
 console.log('######################### Start #########################')
 
 // Load from file
-for (var i = 0; i < 2; i++) {
+for (var i = 0; i < 1; i++) {
   loadChunk(i)
 }
 
 // Test loop speed
-console.log('~~~~~~~~~~~~~~~~~ Test Loop Speed ~~~~~~~~~~~~~~~~~~~~~~~')
-loopThroughSubredditsArray(sub => {})
-console.log('Subreddit array empty loop:', stopwatch())
-loopThroughAuthorsArray(author => {})
-console.log('Author array empty loop:', stopwatch())
-console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+testLoopSpeed()
 
-// Compare
-let comment_minimum = 50000
-loopThroughSubredditsArray(sub => {
-  if (sub.cmt < comment_minimum) return false
-  let response = {subreddit: sub.nm, c: sub.cmt, x_subs: {}}
-  loopThroughAuthorsArray(author => {
-    let match = false
-    author.sub.forEach(sr => {
-      if (sub == sr) match = true
-    })
-
-    if (match) {
-      author.sub.forEach(sr => {
-        if (sr.cmt < comment_minimum) return false
-        if (sr == sub) return false
-        if (typeof response.x_subs[sr.nm] !== 'object') response.x_subs[sr.nm] = {x: 0, c: sr.cmt}
-        response.x_subs[sr.nm].x++
-      })
-    }
-
-  })
-  writeToFile(sub.nm, JSON.stringify(response))
-  console.log(sub.nm, stopwatch())
+// Crunch and writeToFile
+writeAll(crunch()).catch(err => {console.error(err)}).then(() => {
+  console.log('')
+  console.log('######################### Done #########################')
 })
-
-
-console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Done !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
