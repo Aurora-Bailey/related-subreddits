@@ -117,7 +117,7 @@ function testLoopSpeed () {
   console.log('Author array empty loop:', stopwatch())
 }
 
-let comment_minimum = 1000
+let comment_minimum = 999
 function crunch () {
   let response_array = []
 
@@ -141,6 +141,7 @@ function crunch () {
       console.log(count_authors)
       memoryUsed()
     }
+    if (author.sub.length > 100) return false
     author.sub.forEach(subreddit => {
       if (subreddit.cmt < comment_minimum) return false
       author.sub.forEach(sub => {
