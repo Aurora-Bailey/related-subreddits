@@ -119,7 +119,6 @@ function testLoopSpeed () {
 
 let comment_minimum = 1000
 function crunch () {
-  let count = 0
   let response_array = []
 
   console.log('######################### Write index #########################')
@@ -135,29 +134,39 @@ function crunch () {
   response_array.push({sub: '_index_subreddits', data: JSON.stringify({length: sub_list.length, list: sub_list, cmt: sub_cmt})})
 
   console.log('######################### Start the crunch #########################')
-  loopThroughSubredditsArray(sub => {
-    if (sub.cmt < comment_minimum) return false
-    let response = {subreddit: sub.nm, c: sub.cmt, x_subs: {}}
-    loopThroughAuthorsArray(author => {
-      let match = false
-      author.sub.forEach(sr => {
-        if (sub == sr) match = true
+  loopThroughAuthorsArray(author => {
+    author.sub.forEach(subreddit => {
+      if (subreddit.cmt < comment_minimum) return false
+      author.sub.forEach(sub => {
+        if (sub.cmt < comment_minimum) return false
+        if (sub.nm == subreddit.nm) return false
+        if (typeof subreddit['x_subs'] !== 'object') subreddit['x_subs'] = {}
+        if (typeof subreddit.x_subs[sub.nm] !== 'object') subreddit.x_subs[sub.nm] = {x: 0, c: sub.cmt}
+        subreddit.x_subs[sub.nm].x++
       })
-
-      if (match) {
-        author.sub.forEach(sr => {
-          if (sr.cmt < comment_minimum) return false
-          if (sr == sub) return false
-          if (typeof response.x_subs[sr.nm] !== 'object') response.x_subs[sr.nm] = {x: 0, c: sr.cmt}
-          response.x_subs[sr.nm].x++
-        })
-      }
-
     })
-    count++
-    response_array.push({sub: sub.nm, data: JSON.stringify(response)})
-    console.log(count + '/' + total_subreddits, stopwatch(), sub.nm)
   })
+  console.log('Loop through authors', stopwatch())
+  memoryUsed()
+
+  loopThroughSubredditsArray(subreddit => {
+    if (typeof subreddit['x_subs'] === 'undefined') return false
+
+    // delete x_subs with only 1 user
+    Object.keys(subreddit.x_subs).forEach(sub => {
+      if (subreddit.x_subs[sub].x < 3) {
+        delete subreddit.x_subs[sub]
+      }
+    })
+    if(Object.keys(subreddit.x_subs).length <1) return false
+
+    // build response
+    let response = {subreddit: subreddit.nm, c: subreddit.cmt, x_subs: subreddit.x_subs}
+    response_array.push({sub: subreddit.nm, data: JSON.stringify(response)})
+  })
+  console.log('Loop through subreddits', stopwatch())
+  memoryUsed()
+
   return response_array
 }
 
@@ -184,9 +193,6 @@ console.log('######################### Start #########################')
 for (var i = 0; i < 24; i++) {
   loadChunk(i)
 }
-
-// Test loop speed
-testLoopSpeed()
 
 // Crunch and writeToFile
 writeAll(crunch()).catch(err => {console.error(err)}).then(() => {
