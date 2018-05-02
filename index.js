@@ -18,7 +18,7 @@ function createS3Bucket () {
 function writeS3Bucket (bucket, name, data) {
   return new Promise((resolve, reject) => {
     params = {Bucket: bucket, Key: name, Body: data}
-    console.log('write ', name)
+    // console.log('write ', name)
     s3.putObject(params, function(err, data) {
       console.log('saved ', name)
       if (err) reject(err)
@@ -134,7 +134,10 @@ function crunch () {
   response_array.push({sub: '_index_subreddits', data: JSON.stringify({length: sub_list.length, list: sub_list, cmt: sub_cmt})})
 
   console.log('######################### Start the crunch #########################')
+  let count_authors = 0
   loopThroughAuthorsArray(author => {
+    count_authors++
+    if (count_authors % 1e5 === 0) console.log(count_authors)
     author.sub.forEach(subreddit => {
       if (subreddit.cmt < comment_minimum) return false
       author.sub.forEach(sub => {
@@ -149,8 +152,12 @@ function crunch () {
   console.log('Loop through authors', stopwatch())
   memoryUsed()
 
+  let count_subreddits = 0
   loopThroughSubredditsArray(subreddit => {
     if (typeof subreddit['x_subs'] === 'undefined') return false
+
+    count_subreddits++
+    if (count_subreddits % 1e4 === 0) console.log(count_subreddits)
 
     // delete x_subs with only 1 user
     Object.keys(subreddit.x_subs).forEach(sub => {
