@@ -137,7 +137,10 @@ function crunch () {
   let count_authors = 0
   loopThroughAuthorsArray(author => {
     count_authors++
-    if (count_authors % 1e5 === 0) console.log(count_authors)
+    if (count_authors % 1e4 === 0) {
+      console.log(count_authors)
+      memoryUsed()
+    }
     author.sub.forEach(subreddit => {
       if (subreddit.cmt < comment_minimum) return false
       author.sub.forEach(sub => {
@@ -157,7 +160,7 @@ function crunch () {
     if (typeof subreddit['x_subs'] === 'undefined') return false
 
     count_subreddits++
-    if (count_subreddits % 1e4 === 0) console.log(count_subreddits)
+    if (count_subreddits % 1e3 === 0) memoryUsed()
 
     // delete x_subs with only 1 user
     Object.keys(subreddit.x_subs).forEach(sub => {
