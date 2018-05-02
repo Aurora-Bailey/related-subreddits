@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const AWS = require('aws-sdk')
 const s3 = new AWS.S3()
+const config = require('./config')
 
 function createS3Bucket () {
   return new Promise((resolve, reject) => {
@@ -117,7 +118,6 @@ function testLoopSpeed () {
   console.log('Author array empty loop:', stopwatch())
 }
 
-let comment_minimum = 999
 function crunch () {
   let response_array = []
 
@@ -125,7 +125,7 @@ function crunch () {
   let sub_list = []
   let sub_cmt = []
   loopThroughSubredditsArray(sub => {
-    if (sub.cmt < comment_minimum) return false
+    if (sub.cmt < config.skip_subs_with_commenters_less_than) return false
     sub_list.push(sub.nm)
     sub_cmt.push(sub.cmt)
   })
@@ -141,11 +141,11 @@ function crunch () {
       console.log(count_authors)
       memoryUsed()
     }
-    if (author.sub.length > 100) return false
+    if (author.sub.length > config.skip_users_with_subs_greater_than) return false
     author.sub.forEach(subreddit => {
-      if (subreddit.cmt < comment_minimum) return false
+      if (subreddit.cmt < config.skip_subs_with_commenters_less_than) return false
       author.sub.forEach(sub => {
-        if (sub.cmt < comment_minimum) return false
+        if (sub.cmt < config.skip_subs_with_commenters_less_than) return false
         if (sub.nm == subreddit.nm) return false
         if (typeof subreddit['x_subs'] !== 'object') subreddit['x_subs'] = {}
         if (typeof subreddit.x_subs[sub.nm] !== 'object') subreddit.x_subs[sub.nm] = {x: 0, c: sub.cmt}
@@ -165,7 +165,7 @@ function crunch () {
 
     // delete x_subs with only 1 user
     Object.keys(subreddit.x_subs).forEach(sub => {
-      if (subreddit.x_subs[sub].x < 3) {
+      if (subreddit.x_subs[sub].x < config.delete_cross_subs_with_overlap_less_than) {
         delete subreddit.x_subs[sub]
       }
     })
