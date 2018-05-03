@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const AWS = require('aws-sdk')
+const zlib = require('zlib')
 const s3 = new AWS.S3()
 const config = require('./config')
 
@@ -18,12 +19,17 @@ function createS3Bucket () {
 
 function writeS3Bucket (bucket, name, data) {
   return new Promise((resolve, reject) => {
-    params = {Bucket: bucket, Key: name, Body: data}
-    // console.log('write ', name)
-    s3.putObject(params, function(err, data) {
-      console.log('saved ', name)
+    zlib.gzip(Buffer.from(data), (err, data_gzip) => {
       if (err) reject(err)
-      else resolve()
+      else {
+        params = {Bucket: bucket, Key: name, Body: data_gzip, ContentEncoding: 'gzip', ContentType: 'application/json'}
+        // console.log('write ', name)
+        s3.putObject(params, function(err, data) {
+          console.log('saved ', name)
+          if (err) reject(err)
+          else resolve()
+        })
+      }
     })
   })
 }
@@ -201,7 +207,7 @@ function writeAll (response_array) {
 console.log('######################### Start #########################')
 
 // Load from file
-for (var i = 0; i < 24; i++) {
+for (var i = 0; i < config.number_of_files_to_load; i++) {
   loadChunk(i)
 }
 
