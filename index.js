@@ -52,7 +52,7 @@ function padWithZero (num) {
 }
 
 function loadChunk (index) {
-  let file = path.resolve('./data/author_subreddits_all_0000000000' + padWithZero(index))
+  let file = path.resolve('./data/author_subreddits_all_0000000000' + padWithZero(index) + '.csv')
   console.log('Loading -', file)
   let content = fs.readFileSync(file).toString().trim().split('\n')
   content.shift()
