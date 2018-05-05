@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/gbradthompson/related-subreddits#readme",
   "dependencies": {
-    "aws-sdk": "^2.229.1"
+    "aws-sdk": "^2.229.1",
+    "csv-parse": "^2.2.0"
   }
 }

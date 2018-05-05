@@ -2,17 +2,23 @@ const fs = require('fs')
 const path = require('path')
 const AWS = require('aws-sdk')
 const zlib = require('zlib')
+const parse = require('csv-parse/lib/sync')
 const s3 = new AWS.S3()
 const config = require('./config')
 
 function createS3Bucket () {
   return new Promise((resolve, reject) => {
-    let bucketName = "related-subreddits-" + Math.floor(Math.random() * 1e8)
+    let params = {
+      Bucket: "related-subreddits-" + Math.floor(Math.random() * 1e8),
+      CreateBucketConfiguration: {
+        LocationConstraint: "us-west-2"
+      }
+    }
+    console.log(params.Bucket)
     console.log('######################### Create new bucket #########################')
-    console.log(bucketName)
-    s3.createBucket({Bucket: bucketName}, function(err, data) {
+    s3.createBucket({Bucket: params.Bucket}, function(err, data) {
       if (err) reject(err)
-      else resolve(bucketName)
+      else resolve(params.Bucket)
     })
   })
 }
@@ -54,8 +60,8 @@ function padWithZero (num) {
 function loadChunk (index) {
   let file = path.resolve('./data/author_subreddits_all_0000000000' + padWithZero(index) + '.csv')
   console.log('Loading -', file)
-  let content = fs.readFileSync(file).toString().trim().split('\n')
-  content.shift()
+  let content = zlib.gunzipSync(fs.readFileSync(file)).toString().trim().split('\n')
+  content.shift() // remove [ 'author', 'subreddit' ]
   console.log('Processing')
   processChunk(content)
 }
