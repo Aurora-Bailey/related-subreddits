@@ -1,18 +1,16 @@
 const fs = require('fs')
 const path = require('path')
 const AWS = require('aws-sdk')
+AWS.config.update({region: 'us-west-2'});
+const s3 = new AWS.S3()
 const zlib = require('zlib')
 const parse = require('csv-parse/lib/sync')
-const s3 = new AWS.S3()
 const config = require('./config')
 
 function createS3Bucket () {
   return new Promise((resolve, reject) => {
     let params = {
-      Bucket: "related-subreddits-" + Math.floor(Math.random() * 1e8),
-      CreateBucketConfiguration: {
-        LocationConstraint: "us-west-2"
-      }
+      Bucket: "related-subreddits-" + Math.floor(Math.random() * 1e8)
     }
     console.log(params.Bucket)
     console.log('######################### Create new bucket #########################')
@@ -58,7 +56,7 @@ function padWithZero (num) {
 }
 
 function loadChunk (index) {
-  let file = path.resolve('./data/author_subreddits_all_0000000000' + padWithZero(index) + '.csv')
+  let file = path.resolve('./data/author_subreddits_all_0000000000' + padWithZero(index) + '.csv') // load dynamically
   console.log('Loading -', file)
   let content = zlib.gunzipSync(fs.readFileSync(file)).toString().trim().split('\n')
   content.shift() // remove [ 'author', 'subreddit' ]
