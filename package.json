@@ -19,6 +19,7 @@
   "homepage": "https://github.com/gbradthompson/related-subreddits#readme",
   "dependencies": {
     "aws-sdk": "^2.229.1",
-    "csv-parse": "^2.2.0"
+    "csv-parse": "^2.2.0",
+    "marked": "^0.3.19"
   }
 }

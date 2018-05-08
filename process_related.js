@@ -31,10 +31,12 @@ class ProcessRelated {
         console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Load csv files into memory')
         text_file_array.forEach((text_file, i) => {
           let csv_parsed = text_file.split('\n')
+          csv_parsed.shift()
           console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'parse csv file', `${i} / ${text_file_array.length}`)
           this.toMemoryCSV(csv_parsed)
           console.log(lib.memoryUsed(), lib.stopwatch(), '|', `commit csv to memory`)
           csv_parsed = false
+          text_file_array[i] = false
         })
         setTimeout(() => {resolve(true)}, 0)
       })

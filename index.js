@@ -1,9 +1,11 @@
 const lib = require('./lib')
 const related = require('./process_related')
+const products = require('./process_products')
 
 let json_output_chain = {}
-related.start(json_output_chain).catch(err => {console.error(err)}).then(done => {
+products.start(json_output_chain).catch(err => {console.error(err)}).then(done => {
   // console.log(JSON.stringify(json_output_chain['AskReddit']))
+  console.log(json_output_chain)
   console.log(lib.memoryUsed())
 })
 
