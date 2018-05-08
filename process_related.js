@@ -20,7 +20,7 @@ class ProcessRelated {
         console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write subreddit index')
         this.writeSubreddits(json_output_chain)
         console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write subreddits')
-        resolve(true)
+        setTimeout(() => {resolve(true)}, 0)
       })
     })
   }
