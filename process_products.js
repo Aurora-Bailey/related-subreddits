@@ -29,7 +29,7 @@ class ProcessProducts {
 
       // Find Amazon links
       let amazon_product_array = [] // {name: 'Amazon-Product': asin: 'ASDFGHQWER'}
-      let amazon_links = body.match(/(www\.amazon\.com\/([a-zA-Z0-9\.\-\?\+\_\=\&\;\:]*\/|)dp\/[A-Z0-9]{10}|www\.amzn\.com\/[A-Z0-9]{10})/g)
+      let amazon_links = body.match(/(www\.amazon\.com\/([a-zA-Z0-9\.\-\?\+\_\=\&\;\:\%]*\/|)dp\/[A-Z0-9]{10}|www\.amzn\.com\/[A-Z0-9]{10})/g)
       if (amazon_links !== null) {
         amazon_links.forEach(link => {
           let link_split = link.split('/')
@@ -67,7 +67,7 @@ class ProcessProducts {
 
   writeProducts (json_output_chain) {
     Object.keys(this.subreddits_object).forEach(subreddit => {
-      if (typeof json_output_chain[subreddit] !== 'object') json_output_chain[subreddit] = {}
+      if (typeof json_output_chain[subreddit] !== 'object') return false // json_output_chain[subreddit] = {}
       json_output_chain[subreddit].products = {asin: [], name: [], comment: [], count: []}
 
       // Flatten to array
