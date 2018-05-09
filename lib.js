@@ -4,6 +4,7 @@ const AWS = require('aws-sdk')
 AWS.config.update({region: 'us-west-2'});
 const s3 = new AWS.S3()
 const zlib = require('zlib')
+const csv = require('csv-parser')
 const config = require('./config')
 
 class Lib {
@@ -53,18 +54,23 @@ class Lib {
     })
   }
 
-  loadDirectoryFilesAsTextArrays (directory) {
+  loadDirectoryParsed (directory, processLine) {
     return new Promise((resolve, reject) => {
       let files = fs.readdir(path.resolve(directory), (err, files) => {
         if (err) reject(err)
         else {
-          let data_array = []
+          let num_processing = files.length
           files.forEach(file_name => {
-            let filepath = path.resolve(directory, file_name)
-            let text_data = zlib.gunzipSync(fs.readFileSync(filepath)).toString().trim()
-            data_array.push(text_data)
+            let file_path = path.resolve(directory, file_name)
+            fs.createReadStream(file_path).pipe(zlib.createGunzip()).pipe(csv())
+            .on('data', line => {
+              processLine(line)
+            })
+            .on('end', () => {
+              num_processing--
+              if (num_processing === 0) resolve()
+            })
           })
-          resolve(data_array)
         }
       })
     })

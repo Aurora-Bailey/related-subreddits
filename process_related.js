@@ -1,4 +1,3 @@
-const parse = require('csv-parse/lib/sync')
 const config = require('./config')
 const lib = require('./lib')
 
@@ -15,7 +14,7 @@ class ProcessRelated {
   start (json_output_chain) {
     return new Promise((resolve, reject) => {
       console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Start process related')
-      this.loadCSV().catch(err => {console.error(err)}).then(done => {
+      this.loadParseCSV().catch(err => {console.error(err)}).then(() => {
         this.writeSubredditIndex(json_output_chain)
         console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write subreddit index')
         this.writeSubreddits(json_output_chain)
@@ -25,27 +24,9 @@ class ProcessRelated {
     })
   }
 
-  loadCSV () {
-    return new Promise((resolve, reject) => {
-      lib.loadDirectoryFilesAsTextArrays(this.data_directory).catch(err => {reject(err)}).then(text_file_array => {
-        console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Load csv files into memory')
-        text_file_array.forEach((text_file, i) => {
-          let csv_parsed = text_file.split('\n')
-          csv_parsed.shift()
-          console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'parse csv file', `${i} / ${text_file_array.length}`)
-          this.toMemoryCSV(csv_parsed)
-          console.log(lib.memoryUsed(), lib.stopwatch(), '|', `commit csv to memory`)
-          csv_parsed = false
-          text_file_array[i] = false
-        })
-        setTimeout(() => {resolve(true)}, 0)
-      })
-    })
-  }
-
-  toMemoryCSV (arrayCSV) {
-    arrayCSV.forEach(line => {
-      let [author, subreddit] = line.split(',')
+  loadParseCSV () {
+    return lib.loadDirectoryParsed(this.data_directory, line => {
+      let {author, subreddit} = line
 
       let a_c = author.charAt(0)
       let s_c = subreddit.charAt(0)
@@ -71,6 +52,7 @@ class ProcessRelated {
 
       this.subreddit_object[s_c][subreddit].cmt++
       this.author_object[a_c][author].sub.push(this.subreddit_object[s_c][subreddit])
+
     })
   }
 

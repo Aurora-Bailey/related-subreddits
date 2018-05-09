@@ -1,4 +1,4 @@
-const parse = require('csv-parse/lib/sync')
+const marked = require('marked')
 const config = require('./config')
 const lib = require('./lib')
 
@@ -13,7 +13,8 @@ class ProcessProducts {
   start (json_output_chain) {
     return new Promise((resolve, reject) => {
       console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Start process product')
-      this.loadCSV().catch(err => {console.error(err)}).then(done => {
+      this.loadParseCSV().catch(err => {console.error(err)}).then(() => {
+        console.log(lib.memoryUsed(), lib.stopwatch(), '|', `End csv load`)
         this.writeProducts(json_output_chain)
         console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write products')
 
@@ -22,27 +23,9 @@ class ProcessProducts {
     })
   }
 
-  loadCSV () {
-    return new Promise((resolve, reject) => {
-      lib.loadDirectoryFilesAsTextArrays(this.data_directory).catch(err => {reject(err)}).then(text_file_array => {
-        console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Load csv files into memory')
-        text_file_array.forEach((text_file, i) => {
-          let csv_parsed = parse(text_file)
-          csv_parsed.shift()
-          console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'parse csv file', `${i} / ${text_file_array.length}`)
-          this.toMemoryCSV(csv_parsed)
-          console.log(lib.memoryUsed(), lib.stopwatch(), '|', `commit csv to memory`)
-          csv_parsed = false
-          text_file_array[i] = false
-        })
-        setTimeout(() => {resolve(true)}, 0)
-      })
-    })
-  }
-
-  toMemoryCSV (arrayCSV) {
-    arrayCSV.forEach(line => {
-      let [author, subreddit, created_utc, retrieved_on, gilded, score, body] = line
+  loadParseCSV () {
+    return lib.loadDirectoryParsed(this.data_directory, line => {
+      let {author, subreddit, created_utc, retrieved_on, gilded, score, body} = line
 
       // Find Amazon links
       let amazon_product_array = [] // {name: 'Amazon-Product': asin: 'ASDFGHQWER'}
@@ -83,19 +66,19 @@ class ProcessProducts {
   }
 
   writeProducts (json_output_chain) {
-    Object.keys(subreddits_object).forEach(subreddit => {
+    Object.keys(this.subreddits_object).forEach(subreddit => {
       if (typeof json_output_chain[subreddit] !== 'object') json_output_chain[subreddit] = {}
       json_output_chain[subreddit].products = {asin: [], name: [], comment: [], count: []}
 
       // Flatten to array
       let products_array = []
-      Object.keys(subreddits_object[subreddit].products).forEach(product => {
+      Object.keys(this.subreddits_object[subreddit].products).forEach(product => {
         products_array.push({
-          asin: subreddits_object[subreddit].products[product].ref.asin,
-          name: subreddits_object[subreddit].products[product].ref.name,
-          t_count: subreddits_object[subreddit].products[product].ref.count, // total count
-          s_count: subreddits_object[subreddit].products[product].count, // subreddit count
-          comment: subreddits_object[subreddit].products[product].best_comment,
+          asin: this.subreddits_object[subreddit].products[product].ref.asin,
+          name: this.subreddits_object[subreddit].products[product].ref.name,
+          t_count: this.subreddits_object[subreddit].products[product].ref.count, // total count
+          s_count: this.subreddits_object[subreddit].products[product].count, // subreddit count
+          comment: this.subreddits_object[subreddit].products[product].best_comment,
         })
       })
 
@@ -110,7 +93,7 @@ class ProcessProducts {
         json_output_chain[subreddit].products.asin.push(product.asin)
         json_output_chain[subreddit].products.name.push(product.name)
         json_output_chain[subreddit].products.count.push(product.s_count)
-        json_output_chain[subreddit].products.comment.push(product.comment)
+        json_output_chain[subreddit].products.comment.push(marked(product.comment))
       })
     })
   }
