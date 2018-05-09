@@ -141,12 +141,12 @@ class ProcessRelated {
       // build response
       if (typeof json_output_chain[subreddit.nm] !== 'object') json_output_chain[subreddit.nm] = {}
       json_output_chain[subreddit.nm].subreddit = subreddit.nm
-      json_output_chain[subreddit.nm].c = subreddit.cmt
-      json_output_chain[subreddit.nm].x_subs = {s: [], x: [], c: []} //, p: []}
+      json_output_chain[subreddit.nm].commenters = subreddit.cmt
+      json_output_chain[subreddit.nm].x_subs = {subreddit: [], cross_commenters: [], commenters: []} //, p: []}
       x_subs_arr.slice(0, config.number_of_x_subs_per_subreddit).forEach(xsub => {
-        json_output_chain[subreddit.nm].x_subs.s.push(xsub.s)
-        json_output_chain[subreddit.nm].x_subs.x.push(xsub.x)
-        json_output_chain[subreddit.nm].x_subs.c.push(xsub.c)
+        json_output_chain[subreddit.nm].x_subs.subreddit.push(xsub.s)
+        json_output_chain[subreddit.nm].x_subs.cross_commenters.push(xsub.x)
+        json_output_chain[subreddit.nm].x_subs.commenters.push(xsub.c)
         // json_output_chain[subreddit.nm].x_subs.p.push(xsub.p)
       })
     })
