@@ -75,6 +75,7 @@ class Lib {
 
   loadDirectoryParsed (directory, processLine) {
     return new Promise((resolve, reject) => {
+      let lines_loaded = 0
       let files = fs.readdir(path.resolve(directory), (err, files) => {
         if (err) reject(err)
         else {
@@ -83,6 +84,8 @@ class Lib {
             let file_path = path.resolve(directory, file_name)
             fs.createReadStream(file_path).pipe(zlib.createGunzip()).pipe(csv())
             .on('data', line => {
+              lines_loaded++
+              if (lines_loaded % 1e6) console.log(this.memoryUsed(), 'lines loaded:', lines_loaded)
               processLine(line)
             })
             .on('end', () => {
