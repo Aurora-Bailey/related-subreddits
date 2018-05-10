@@ -34,11 +34,17 @@ class ProcessSubredditAbout {
     Object.keys(json_output_chain).forEach(sub => {
       if (sub === '_index_subreddits') return false
       json_output_chain[sub].x_subs.public_description = []
+      json_output_chain[sub].x_subs.subscribers = []
+      json_output_chain[sub].x_subs.over18 = []
       json_output_chain[sub].x_subs.subreddits.forEach(subreddit => {
         if (typeof this.subreddit_about_pages[subreddit] === 'object') {
           json_output_chain[sub].x_subs.public_description.push(marked(this.subreddit_about_pages[subreddit].public_description))
+          json_output_chain[sub].x_subs.subscribers.push(marked(this.subreddit_about_pages[subreddit].subscribers))
+          json_output_chain[sub].x_subs.over18.push(marked(this.subreddit_about_pages[subreddit].over18))
         } else {
           json_output_chain[sub].x_subs.public_description.push('Description not found!')
+          json_output_chain[sub].x_subs.subscribers.push(0)
+          json_output_chain[sub].x_subs.over18.push(false)
         }
       })
     })
