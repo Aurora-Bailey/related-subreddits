@@ -39,8 +39,8 @@ class ProcessSubredditAbout {
       json_output_chain[sub].x_subs.subreddits.forEach(subreddit => {
         if (typeof this.subreddit_about_pages[subreddit] === 'object') {
           json_output_chain[sub].x_subs.public_description.push(marked(this.subreddit_about_pages[subreddit].public_description))
-          json_output_chain[sub].x_subs.subscribers.push(marked(this.subreddit_about_pages[subreddit].subscribers))
-          json_output_chain[sub].x_subs.over18.push(marked(this.subreddit_about_pages[subreddit].over18))
+          json_output_chain[sub].x_subs.subscribers.push(this.subreddit_about_pages[subreddit].subscribers)
+          json_output_chain[sub].x_subs.over18.push(this.subreddit_about_pages[subreddit].over18)
         } else {
           json_output_chain[sub].x_subs.public_description.push('Description not found!')
           json_output_chain[sub].x_subs.subscribers.push(0)
@@ -72,8 +72,11 @@ class ProcessSubredditAbout {
           this.pullSubredditData(subreddit_list, callback)
         }, 1000)
       }).catch(err => {
-        console.log('=========== Failed', options.uri)
-        console.log(err)
+        if (!err.error) err.error = {}
+        if (!err.error.reason) err.error.reason = 'unknown'
+        // Fake data
+        this.subreddit_about_pages[sub] = {public_description: err.error.reason, subscribers: 0, over18: false}
+        console.log('Failed', options.uri, 'faking data', JSON.stringify(this.subreddit_about_pages[sub]))
         setTimeout(() => {
           this.pullSubredditData(subreddit_list, callback)
         }, 1000)
