@@ -36,7 +36,7 @@ class ProcessSubredditAbout {
       json_output_chain[sub].banner_img = this.subreddit_about_pages[sub].banner_img || ''
       json_output_chain[sub].header_img = this.subreddit_about_pages[sub].header_img || ''
       json_output_chain[sub].icon_img = this.subreddit_about_pages[sub].icon_img || ''
-      json_output_chain[sub].description_html = this.subreddit_about_pages[sub].description_html || ''
+      json_output_chain[sub].description = this.subreddit_about_pages[sub].description_html || this.subreddit_about_pages[subreddit]
       json_output_chain[sub].subscribers = this.subreddit_about_pages[sub].subscribers || 0
       json_output_chain[sub].accounts_active = this.subreddit_about_pages[sub].accounts_active || 0
       json_output_chain[sub].created_utc = this.subreddit_about_pages[sub].created_utc || 0
@@ -45,10 +45,9 @@ class ProcessSubredditAbout {
       json_output_chain[sub].x_subs.subscribers = []
       json_output_chain[sub].x_subs.over18 = []
       json_output_chain[sub].x_subs.subreddits.forEach(subreddit => {
-        json_output_chain[sub].x_subs.public_description.push(marked(this.subreddit_about_pages[subreddit].public_description))
-        json_output_chain[sub].x_subs.subscribers.push(this.subreddit_about_pages[subreddit].subscribers)
-        json_output_chain[sub].x_subs.over18.push(this.subreddit_about_pages[subreddit].over18)
-        // if (typeof this.subreddit_about_pages[subreddit].id === 'undefined') // faked data
+        json_output_chain[sub].x_subs.public_description.push(this.subreddit_about_pages[subreddit].public_description_html || this.subreddit_about_pages[subreddit].error)
+        json_output_chain[sub].x_subs.subscribers.push(this.subreddit_about_pages[subreddit].subscribers || 0)
+        json_output_chain[sub].x_subs.over18.push(this.subreddit_about_pages[subreddit].over18 || false)
       })
     })
   }
@@ -58,6 +57,8 @@ class ProcessSubredditAbout {
     Object.keys(json_output_chain).forEach(subreddit => {
       if (subreddit === '_index_subreddits') return false
       if (typeof this.subreddit_about_pages[subreddit] !== 'object') list.push(subreddit)
+      else if (typeof this.subreddit_about_pages[subreddit].id === 'undefined'
+      && typeof typeof this.subreddit_about_pages[subreddit].error === 'undefined') list.push(subreddit)
     })
     return list
   }
@@ -77,9 +78,8 @@ class ProcessSubredditAbout {
       }).catch(err => {
         if (!err.error) err.error = {}
         if (!err.error.reason) err.error.reason = 'unknown'
-        // Fake data
-        this.subreddit_about_pages[sub] = {public_description: err.error.reason, subscribers: 0, over18: false}
-        console.log('Failed', options.uri, 'faking data', JSON.stringify(this.subreddit_about_pages[sub]))
+        this.subreddit_about_pages[sub] = {error: err.error.reason}
+        console.log('Failed', options.uri, 'set data', JSON.stringify(this.subreddit_about_pages[sub]))
         setTimeout(() => {
           this.pullSubredditData(subreddit_list, callback)
         }, 1000)
