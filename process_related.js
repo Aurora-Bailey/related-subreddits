@@ -122,32 +122,78 @@ class ProcessRelated {
       })
       if(Object.keys(subreddit.x_subs).length <1) return false
 
-      // sort by small sub
+      // load into array
       let x_subs_arr = []
       Object.keys(subreddit.x_subs).forEach(xsub => {
-        x_subs_arr.push({
-          s: xsub,
-          x: subreddit.x_subs[xsub].x,
-          c: subreddit.x_subs[xsub].c,
-          p: this.percent(subreddit.x_subs[xsub].x, subreddit.x_subs[xsub].c)
-        })
+        subreddit.x_subs[xsub].s = xsub
+        subreddit.x_subs[xsub].percent_child = this.percent(subreddit.x_subs[xsub].x, subreddit.x_subs[xsub].c)
+        subreddit.x_subs[xsub].percent_parent = this.percent(subreddit.x_subs[xsub].x, subreddit.cmt)
+        x_subs_arr.push(subreddit.x_subs[xsub])
       })
+      // sort by child
       x_subs_arr.sort((a, b) => {
-        if (a.p === b.p) return 0
-        return a.p > b.p ? -1 : 1
+        if (a.percent_child === b.percent_child) return 0
+        return a.percent_child > b.percent_child ? -1 : 1
       })
+      // rank child
+      x_subs_arr.forEach((xsub, index) => {
+        xsub.rank_child = index
+      })
+      // sort by parent
+      x_subs_arr.sort((a, b) => {
+        if (a.percent_parent === b.percent_parent) return 0
+        return a.percent_parent > b.percent_parent ? -1 : 1
+      })
+      // rank parent
+      x_subs_arr.forEach((xsub, index) => {
+        xsub.rank_parent = index
+      })
+
+      // merge ranks
+      let x_subs_arr_length = x_subs_arr.length
+      x_subs_arr.forEach(xsub => {
+        xsub.percent_combined = ((this.percent(x_subs_arr_length - xsub.rank_child, x_subs_arr_length) + this.percent(x_subs_arr_length - xsub.rank_parent, x_subs_arr_length)) / 2)
+      })
+      // sort by combined
+      x_subs_arr.sort((a, b) => {
+        if (a.percent_combined === b.percent_combined) return 0
+        return a.percent_combined > b.percent_combined ? -1 : 1
+      })
+      // rank combined
+      x_subs_arr.forEach((xsub, index) => {
+        xsub.rank_combined = index
+      })
+
 
 
       // build response
       if (typeof json_output_chain[subreddit.nm] !== 'object') json_output_chain[subreddit.nm] = {}
       json_output_chain[subreddit.nm].subreddit = subreddit.nm
       json_output_chain[subreddit.nm].commenters = subreddit.cmt
-      json_output_chain[subreddit.nm].x_subs = {subreddits: [], cross_commenters: [], commenters: []} //, p: []}
-      x_subs_arr.slice(0, config.number_of_x_subs_per_subreddit).forEach(xsub => {
+      json_output_chain[subreddit.nm].x_subs = {
+        subreddits: [],
+        // cross_commenters: [],
+        // commenters: [],
+        // percent_child: [],
+        // percent_parent: [],
+        // percent_combined: [],
+        rank_child: [],
+        rank_parent: [],
+        rank_combined: []
+      }
+      x_subs_arr.forEach(xsub => {
+        if (xsub.rank_combined >= config.number_of_x_subs_per_subreddit
+          && xsub.rank_parent >= config.number_of_x_subs_per_subreddit
+          && xsub.rank_child >= config.number_of_x_subs_per_subreddit) return false
         json_output_chain[subreddit.nm].x_subs.subreddits.push(xsub.s)
-        json_output_chain[subreddit.nm].x_subs.cross_commenters.push(xsub.x)
-        json_output_chain[subreddit.nm].x_subs.commenters.push(xsub.c)
-        // json_output_chain[subreddit.nm].x_subs.p.push(xsub.p)
+        // json_output_chain[subreddit.nm].x_subs.cross_commenters.push(xsub.x)
+        // json_output_chain[subreddit.nm].x_subs.commenters.push(xsub.c)
+        // json_output_chain[subreddit.nm].x_subs.percent_child.push(xsub.percent_child)
+        // json_output_chain[subreddit.nm].x_subs.percent_parent.push(xsub.percent_parent)
+        // json_output_chain[subreddit.nm].x_subs.percent_combined.push(xsub.percent_combined)
+        json_output_chain[subreddit.nm].x_subs.rank_child.push(xsub.rank_child)
+        json_output_chain[subreddit.nm].x_subs.rank_parent.push(xsub.rank_parent)
+        json_output_chain[subreddit.nm].x_subs.rank_combined.push(xsub.rank_combined)
       })
     })
     console.log(lib.memoryUsed(), lib.stopwatch(), '|', `loop through subreddits done`)

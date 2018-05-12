@@ -33,19 +33,22 @@ class ProcessSubredditAbout {
   writeAbout (json_output_chain) {
     Object.keys(json_output_chain).forEach(sub => {
       if (sub === '_index_subreddits') return false
+      json_output_chain[sub].banner_img = this.subreddit_about_pages[sub].banner_img || ''
+      json_output_chain[sub].header_img = this.subreddit_about_pages[sub].header_img || ''
+      json_output_chain[sub].icon_img = this.subreddit_about_pages[sub].icon_img || ''
+      json_output_chain[sub].description_html = this.subreddit_about_pages[sub].description_html || ''
+      json_output_chain[sub].subscribers = this.subreddit_about_pages[sub].subscribers || 0
+      json_output_chain[sub].accounts_active = this.subreddit_about_pages[sub].accounts_active || 0
+      json_output_chain[sub].created_utc = this.subreddit_about_pages[sub].created_utc || 0
+
       json_output_chain[sub].x_subs.public_description = []
       json_output_chain[sub].x_subs.subscribers = []
       json_output_chain[sub].x_subs.over18 = []
       json_output_chain[sub].x_subs.subreddits.forEach(subreddit => {
-        if (typeof this.subreddit_about_pages[subreddit] === 'object') {
-          json_output_chain[sub].x_subs.public_description.push(marked(this.subreddit_about_pages[subreddit].public_description))
-          json_output_chain[sub].x_subs.subscribers.push(this.subreddit_about_pages[subreddit].subscribers)
-          json_output_chain[sub].x_subs.over18.push(this.subreddit_about_pages[subreddit].over18)
-        } else {
-          json_output_chain[sub].x_subs.public_description.push('Description not found!')
-          json_output_chain[sub].x_subs.subscribers.push(0)
-          json_output_chain[sub].x_subs.over18.push(false)
-        }
+        json_output_chain[sub].x_subs.public_description.push(marked(this.subreddit_about_pages[subreddit].public_description))
+        json_output_chain[sub].x_subs.subscribers.push(this.subreddit_about_pages[subreddit].subscribers)
+        json_output_chain[sub].x_subs.over18.push(this.subreddit_about_pages[subreddit].over18)
+        // if (typeof this.subreddit_about_pages[subreddit].id === 'undefined') // faked data
       })
     })
   }

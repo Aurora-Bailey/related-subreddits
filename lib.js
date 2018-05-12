@@ -85,7 +85,7 @@ class Lib {
             fs.createReadStream(file_path).pipe(zlib.createGunzip()).pipe(csv())
             .on('data', line => {
               lines_loaded++
-              if (lines_loaded % 1e6) console.log(this.memoryUsed(), 'lines loaded:', lines_loaded)
+              if (lines_loaded % 1e6 === 0) console.log(this.memoryUsed(), 'lines loaded:', lines_loaded)
               processLine(line)
             })
             .on('end', () => {
