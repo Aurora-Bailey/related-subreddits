@@ -172,8 +172,8 @@ class ProcessRelated {
       json_output_chain[subreddit.nm].commenters = subreddit.cmt
       json_output_chain[subreddit.nm].x_subs = {
         subreddits: [],
-        // cross_commenters: [],
-        // commenters: [],
+        cross_commenters: [],
+        commenters: [],
         // percent_child: [],
         // percent_parent: [],
         // percent_combined: [],
