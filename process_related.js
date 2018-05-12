@@ -186,8 +186,8 @@ class ProcessRelated {
           && xsub.rank_parent >= config.number_of_x_subs_per_subreddit
           && xsub.rank_child >= config.number_of_x_subs_per_subreddit) return false
         json_output_chain[subreddit.nm].x_subs.subreddits.push(xsub.s)
-        // json_output_chain[subreddit.nm].x_subs.cross_commenters.push(xsub.x)
-        // json_output_chain[subreddit.nm].x_subs.commenters.push(xsub.c)
+        json_output_chain[subreddit.nm].x_subs.cross_commenters.push(xsub.x)
+        json_output_chain[subreddit.nm].x_subs.commenters.push(xsub.c)
         // json_output_chain[subreddit.nm].x_subs.percent_child.push(xsub.percent_child)
         // json_output_chain[subreddit.nm].x_subs.percent_parent.push(xsub.percent_parent)
         // json_output_chain[subreddit.nm].x_subs.percent_combined.push(xsub.percent_combined)
