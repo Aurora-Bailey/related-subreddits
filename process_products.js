@@ -56,29 +56,44 @@ class ProcessProducts {
         // Subreddits
         if (typeof this.subreddits_object[subreddit] !== 'object') this.subreddits_object[subreddit] = {products: {}}
         if (typeof this.subreddits_object[subreddit].products[product.asin] !== 'object') {
-          this.subreddits_object[subreddit].products[product.asin] = {ref: this.products_object[product.asin], count: 0, best_comment: body, comment_score: score}
+          this.subreddits_object[subreddit].products[product.asin] = {ref: this.products_object[product.asin], count: 0, first_comment: created_utc, last_comment: created_utc, best_comment: body, comment_score: score}
         }
         this.subreddits_object[subreddit].products[product.asin].count++
         if (score > this.subreddits_object[subreddit].products[product.asin].comment_score) this.subreddits_object[subreddit].products[product.asin].best_comment = body
+        if (created_utc > this.subreddits_object[subreddit].products[product.asin].last_comment) this.subreddits_object[subreddit].products[product.asin].last_comment = created_utc
+        if (created_utc < this.subreddits_object[subreddit].products[product.asin].first_comment) this.subreddits_object[subreddit].products[product.asin].first_comment = created_utc
       })
 
     })
   }
 
   writeProducts (json_output_chain) {
+    let num_ads = 0
     Object.keys(this.subreddits_object).forEach(subreddit => {
       if (typeof json_output_chain[subreddit] !== 'object') return false // json_output_chain[subreddit] = {}
-      json_output_chain[subreddit].products = {asin: [], name: [], comment: [], count: []}
+      json_output_chain[subreddit].products = {
+        asin: [],
+        name: [],
+        comment: [],
+        // last_comment: [],
+        // first_comment: [],
+        count: []
+      }
 
       // Flatten to array
       let products_array = []
       Object.keys(this.subreddits_object[subreddit].products).forEach(product => {
+        // skip old products
+        if (this.subreddits_object[subreddit].products[product].last_comment < (Date.now() / 1000) - (60 * 60 * 24 * 365 * 2) ) return false // 2 years
+        // push to array
         products_array.push({
           asin: this.subreddits_object[subreddit].products[product].ref.asin,
           name: this.subreddits_object[subreddit].products[product].ref.name,
           t_count: this.subreddits_object[subreddit].products[product].ref.count, // total count
           s_count: this.subreddits_object[subreddit].products[product].count, // subreddit count
-          comment: this.subreddits_object[subreddit].products[product].best_comment,
+          // last_comment: this.subreddits_object[subreddit].products[product].last_comment,
+          // first_comment: this.subreddits_object[subreddit].products[product].first_comment,
+          comment: this.subreddits_object[subreddit].products[product].best_comment
         })
       })
 
@@ -90,12 +105,16 @@ class ProcessProducts {
 
       // Write top results
       products_array.slice(0, config.number_of_products_per_subreddit).forEach(product => {
+        num_ads++
         json_output_chain[subreddit].products.asin.push(product.asin)
         json_output_chain[subreddit].products.name.push(product.name)
         json_output_chain[subreddit].products.count.push(product.s_count)
         json_output_chain[subreddit].products.comment.push(marked(product.comment))
+        // json_output_chain[subreddit].products.last_comment.push(new Date(product.last_comment * 1000).toGMTString())
+        // json_output_chain[subreddit].products.first_comment.push(new Date(product.first_comment * 1000).toGMTString())
       })
     })
+    console.log('Number of ads:', num_ads)
   }
 }
 
