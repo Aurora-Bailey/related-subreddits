@@ -15,8 +15,6 @@ class ProcessRelated {
     return new Promise((resolve, reject) => {
       console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Start process related')
       this.loadParseCSV().catch(err => {console.error(err)}).then(() => {
-        this.writeSubredditIndex(json_output_chain)
-        console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write subreddit index')
         this.writeSubreddits(json_output_chain)
         console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write subreddits')
         setTimeout(() => {resolve(true)}, 0)
@@ -72,19 +70,6 @@ class ProcessRelated {
         processFunction(auth)
       })
     })
-  }
-
-  writeSubredditIndex (json_output_chain) {
-    let sub_list = []
-    let sub_cmt = []
-    this.loopThroughSubredditsArray(sub => {
-      if (sub.cmt < config.skip_subs_with_commenters_less_than) return false
-      sub_list.push(sub.nm)
-      sub_cmt.push(sub.cmt)
-    })
-    if (typeof json_output_chain['_index_subreddits'] !== 'object') json_output_chain['_index_subreddits'] = {}
-    json_output_chain['_index_subreddits'].subreddits = sub_list
-    json_output_chain['_index_subreddits'].commenters = sub_cmt
   }
 
   writeSubreddits (json_output_chain) {

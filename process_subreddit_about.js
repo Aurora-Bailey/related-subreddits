@@ -40,7 +40,6 @@ class ProcessSubredditAbout {
 
   writeAbout (json_output_chain) {
     Object.keys(json_output_chain).forEach(sub => {
-      if (sub === '_index_subreddits') return false
       if (typeof this.subreddit_about_pages[sub].description === 'undefined') this.subreddit_about_pages[sub].description = this.subreddit_about_pages[sub].error_message
       if (typeof this.subreddit_about_pages[sub].public_description === 'undefined') this.subreddit_about_pages[sub].public_description = this.subreddit_about_pages[sub].error_message
       // json_output_chain[sub].banner_img = this.subreddit_about_pages[sub].banner_img || ''
@@ -67,7 +66,6 @@ class ProcessSubredditAbout {
   subredditsNotInData (json_output_chain) {
     let list = []
     Object.keys(json_output_chain).forEach(subreddit => {
-      if (subreddit === '_index_subreddits') return false
       if (typeof this.subreddit_about_pages[subreddit] !== 'object') list.push(subreddit)
     })
     return list
