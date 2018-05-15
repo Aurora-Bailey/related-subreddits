@@ -84,10 +84,14 @@ class Lib {
           let num_processing = files.length
           files.forEach(file_name => {
             let file_path = path.resolve(directory, file_name)
+            let in_quote = false
             fs.createReadStream(file_path).pipe(zlib.createGunzip())
             .on('data', chunk => {
-              for (let i = 0; i < chunk.length; ++i)
-                if (chunk[i] === 10) count_lines++
+              // console.log(chunk.toString())
+              for (let i = 0; i < chunk.length; ++i) {
+                if (chunk[i] === 34) in_quote = !in_quote
+                if (chunk[i] === 10 && !in_quote) count_lines++
+              }
             })
             .on('end', () => {
               num_processing--
