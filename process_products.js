@@ -1,6 +1,8 @@
 const marked = require('marked')
 const config = require('./config')
 const lib = require('./lib')
+const chalk = require('chalk')
+const Progress = require('./progress')
 
 class ProcessProducts {
   constructor () {
@@ -12,11 +14,11 @@ class ProcessProducts {
 
   start (json_output_chain) {
     return new Promise((resolve, reject) => {
-      console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Start process product')
       this.loadParseCSV().catch(err => {console.error(err)}).then(() => {
-        console.log(lib.memoryUsed(), lib.stopwatch(), '|', `End csv load`)
+        console.log(`Loaded csv ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
         this.writeProducts(json_output_chain)
-        console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write products')
+        console.log(`Wrote to json_output_chain ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
+
 
         setTimeout(() => {resolve(true)}, 0)
       })
@@ -114,7 +116,7 @@ class ProcessProducts {
         // json_output_chain[subreddit].products.first_comment.push(new Date(product.first_comment * 1000).toGMTString())
       })
     })
-    console.log('Number of ads:', num_ads)
+    console.log(`${num_ads} ads found`)
   }
 }
 

@@ -2,6 +2,8 @@ const config = require('./config')
 const marked = require('marked')
 const rp = require('request-promise')
 const lib = require('./lib')
+const chalk = require('chalk')
+const Progress = require('./progress')
 
 class ProcessSubredditAbout {
   constructor () {
@@ -11,17 +13,19 @@ class ProcessSubredditAbout {
 
   start (json_output_chain) {
     return new Promise((resolve, reject) => {
+      console.log(`Downloading about page from s3 ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
       lib.getS3ObjectGunzip('ngau', 'subreddit_about.json').catch(err => {console.error(err)}).then(data => {
+        console.log(`Loaded about page from s3 ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
         this.subreddit_about_pages = JSON.parse(data)
 
         let subreddits_without_data = this.subredditsNotInData(json_output_chain)
         let subreddits_without_data_length = subreddits_without_data.length
-        console.log(JSON.stringify(subreddits_without_data))
-        console.log(subreddits_without_data_length, 'Subreddits found without data!')
-        console.log(Object.keys(this.subreddit_about_pages).length, 'Subreddits found on S3.')
+        console.log(`${Object.keys(this.subreddit_about_pages).length} Subreddits found on S3.`)
+        console.log(`${chalk.redBright(subreddits_without_data_length)} Subreddits found without data!`)
         this.pullSubredditData(subreddits_without_data, () => {
+          console.log(`Loaded abbout pages from reddit ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
           if (subreddits_without_data_length > 0) {
-            console.log('upload to S3')
+            console.log('upload about file back to S3')
             lib.writeS3BucketGzip('ngau', 'subreddit_about.json', JSON.stringify(this.subreddit_about_pages)).catch(err => {console.error(err)}).then(() => {
               this.writeAbout(json_output_chain)
               resolve()
@@ -76,7 +80,7 @@ class ProcessSubredditAbout {
       callback()
     } else {
       let sub = subreddit_list.pop()
-      console.log('Pulling about for', sub)
+      console.log(`Pulling about for ${chalk.yellowBright(sub)}`)
       const options = {uri: `https://www.reddit.com/r/${sub}/about.json`, json: true}
       rp(options).then(results => {
         this.subreddit_about_pages[sub] = results.data
@@ -87,7 +91,7 @@ class ProcessSubredditAbout {
         if (!err.error) err.error = {}
         if (!err.error.reason) err.error.reason = 'unknown'
         this.subreddit_about_pages[sub] = {error_message: err.error.reason}
-        console.log('Failed', options.uri, 'set data', JSON.stringify(this.subreddit_about_pages[sub]))
+        console.log(chalk.redBright('Failed'), options.uri, 'set data', JSON.stringify(this.subreddit_about_pages[sub]))
         setTimeout(() => {
           this.pullSubredditData(subreddit_list, callback)
         }, 1000)

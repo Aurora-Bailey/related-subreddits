@@ -6,6 +6,8 @@ const s3 = new AWS.S3()
 const zlib = require('zlib')
 const csv = require('csv-parser')
 const config = require('./config')
+const chalk = require('chalk')
+const Progress = require('./progress')
 
 class Lib {
   constructor () {
@@ -73,27 +75,66 @@ class Lib {
     })
   }
 
-  loadDirectoryParsed (directory, processLine) {
+  getDirectoryNumLines (directory) {
     return new Promise((resolve, reject) => {
-      let lines_loaded = 0
+      let count_lines = 0
       let files = fs.readdir(path.resolve(directory), (err, files) => {
         if (err) reject(err)
         else {
           let num_processing = files.length
           files.forEach(file_name => {
             let file_path = path.resolve(directory, file_name)
-            fs.createReadStream(file_path).pipe(zlib.createGunzip()).pipe(csv())
-            .on('data', line => {
-              lines_loaded++
-              if (lines_loaded % 1e6 === 0) console.log(this.memoryUsed(), 'lines loaded:', lines_loaded)
-              processLine(line)
+            fs.createReadStream(file_path).pipe(zlib.createGunzip())
+            .on('data', chunk => {
+              for (let i = 0; i < chunk.length; ++i)
+                if (chunk[i] === 10) count_lines++
             })
             .on('end', () => {
               num_processing--
-              if (num_processing === 0) resolve()
+              if (num_processing === 0) resolve(count_lines)
             })
           })
         }
+      })
+    })
+  }
+
+  loadDirectoryParsed (directory, processLine) {
+    return new Promise((resolve, reject) => {
+      console.log(`Calculating number of lines in ${chalk.yellowBright(directory)}`)
+      this.getDirectoryNumLines(directory).then(number_of_lines => {
+        console.log(`${number_of_lines} lines found ${chalk.yellowBright('start loading')}`)
+        let update_every_x_lines = Math.floor(number_of_lines / 1000)
+        var bar = new Progress(`Loading [:bar] :percent :rate/s ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
+          complete: '=',
+          incomplete: ' ',
+          width: 50,
+          total: number_of_lines
+        })
+        let lines_loaded = 0
+        let files = fs.readdir(path.resolve(directory), (err, files) => {
+          if (err) reject(err)
+          else {
+            let num_processing = files.length
+            files.forEach(file_name => {
+              let file_path = path.resolve(directory, file_name)
+              fs.createReadStream(file_path).pipe(zlib.createGunzip()).pipe(csv())
+              .on('data', line => {
+                lines_loaded++
+                if (lines_loaded % update_every_x_lines === 0) bar.tick(update_every_x_lines, {memory: this.memoryUsed()}) // console.log(this.memoryUsed(), 'lines loaded:', lines_loaded)
+                processLine(line)
+              })
+              .on('end', () => {
+                num_processing--
+                if (num_processing === 0) {
+                  bar.terminate()
+                  console.log(`Loaded ${number_of_lines} lines from ${files.length} files in ${chalk.greenBright(directory)}`)
+                  resolve()
+                }
+              })
+            })
+          }
+        })
       })
     })
   }

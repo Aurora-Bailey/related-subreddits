@@ -1,5 +1,7 @@
 const config = require('./config')
 const lib = require('./lib')
+const chalk = require('chalk')
+const Progress = require('./progress')
 
 class ProcessRelated {
   constructor () {
@@ -13,10 +15,9 @@ class ProcessRelated {
 
   start (json_output_chain) {
     return new Promise((resolve, reject) => {
-      console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Start process related')
       this.loadParseCSV().catch(err => {console.error(err)}).then(() => {
+        console.log(`Loaded csv ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
         this.writeSubreddits(json_output_chain)
-        console.log(lib.memoryUsed(), lib.stopwatch(), '|', 'Write subreddits')
         setTimeout(() => {resolve(true)}, 0)
       })
     })
@@ -73,11 +74,36 @@ class ProcessRelated {
   }
 
   writeSubreddits (json_output_chain) {
+
+    // let stream = process.stderr
     let count_authors = 0
     this.loopThroughAuthorsArray(author => {
       count_authors++
-      if (count_authors % 1e5 === 0) console.log(lib.memoryUsed(), count_authors)
+    })
+    console.log(`${count_authors} authors found ${chalk.yellowBright('start loop')}`)
+    let update_every_x_lines_authors = Math.floor(count_authors / 100)
+    let bar_author = new Progress(`Looping through authors [:bar] :percent :rate/s ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
+      complete: '=',
+      incomplete: ' ',
+      width: 50,
+      renderThrottle: 0,
+      total: count_authors
+    })
+    bar_author.tick(1, {memory: lib.memoryUsed()})
 
+    let count_author_loops = 0
+    this.loopThroughAuthorsArray(author => {
+      // update bar
+      count_author_loops++
+      if (count_author_loops % update_every_x_lines_authors === 0) bar_author.tick(update_every_x_lines_authors, {memory: lib.memoryUsed()})
+
+      // if (count_author_loops % update_every_x_lines_authors === 0) {
+      //   stream.cursorTo(0);
+      //   stream.write('' + (Math.floor((count_author_loops / count_authors) * 100)) + '%');
+      //   // stream.clearLine();
+      // }
+
+      // do the main thing
       if (author.sub.length > config.skip_users_with_subs_greater_than) return false
       author.sub.forEach(subreddit => {
         if (subreddit.cmt < config.skip_subs_with_commenters_less_than) return false
@@ -90,13 +116,31 @@ class ProcessRelated {
         })
       })
     })
-    console.log(lib.memoryUsed(), lib.stopwatch(), '|', `loop through authors done`)
+    bar_author.terminate()
+    console.log(`Done looping through authors ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
 
     let count_subreddits = 0
     this.loopThroughSubredditsArray(subreddit => {
       count_subreddits++
-      if (count_subreddits % 1e4 === 0) console.log(lib.memoryUsed(), count_subreddits)
+    })
+    console.log(`${count_subreddits} subreddits found ${chalk.yellowBright('start loop')}`)
+    let update_every_x_lines_subreddits = Math.floor(count_subreddits / 100)
+    let bar_subreddit = new Progress(`Looping through subreddits [:bar] :percent :rate/s ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
+      complete: '=',
+      incomplete: ' ',
+      width: 50,
+      renderThrottle: 0,
+      total: count_subreddits
+    })
+    bar_subreddit.tick(1, {memory: lib.memoryUsed()})
 
+    let count_subreddit_loops = 0
+    this.loopThroughSubredditsArray(subreddit => {
+      // update bar
+      count_subreddit_loops++
+      if (count_subreddit_loops % update_every_x_lines_subreddits === 0) bar_subreddit.tick(update_every_x_lines_subreddits, {memory: lib.memoryUsed()})
+
+      // do the main thing
       if (typeof subreddit['x_subs'] === 'undefined') return false // subreddit was under skip_subs_with_commenters_less_than
 
       // delete x_subs with only 1 user
@@ -181,7 +225,8 @@ class ProcessRelated {
         json_output_chain[subreddit.nm].x_subs.rank_combined.push(xsub.rank_combined)
       })
     })
-    console.log(lib.memoryUsed(), lib.stopwatch(), '|', `loop through subreddits done`)
+    bar_subreddit.terminate()
+    console.log(`Done looping through subreddits ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
   }
 
   percent (small, big) {
