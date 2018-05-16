@@ -35,11 +35,12 @@ related.start(json_output_chain).catch(err => {console.error(err)}).then(done =>
           console.log(`uploading ${chalk.yellowBright('index/subreddit_data.json')} start`)
           lib.writeS3BucketGzip(bucket, 'index/subreddit_data.json', JSON.stringify(json_output_chain)).catch(err => {console.error(err)}).then(() => {
             console.log(`upload ${chalk.greenBright('index/subreddit_data.json')} complete`)
+            console.log(`uploading ${chalk.yellowBright('data/subreddit.json')} start`)
             // upload individual data files for each subreddit
             let sent = Object.keys(json_output_chain).length
-            var bar = new Progress(`Uploading to S3 [:bar] :percent :rate/s ${chalk.magentaBright('ETA(:etas)')}`, {
-              complete: '=',
-              incomplete: ' ',
+            var bar = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.magentaBright('ETA(:etas)')}`, {
+              complete: chalk.bgGreen(' '),
+              incomplete: chalk.bgWhite(' '),
               width: 50,
               renderThrottle: 0,
               total: Object.keys(json_output_chain).length
@@ -50,6 +51,7 @@ related.start(json_output_chain).catch(err => {console.error(err)}).then(done =>
                 bar.tick()
                 if (sent === 0) {
                   bar.terminate()
+                  console.log(`upload ${chalk.greenBright('data/subreddit.json')} complete`)
                   console.log(chalk.greenBright('Script is done!'))
                 }
               })

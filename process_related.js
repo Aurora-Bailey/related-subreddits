@@ -82,9 +82,9 @@ class ProcessRelated {
     })
     console.log(`${count_authors} authors found ${chalk.yellowBright('start loop')}`)
     let update_every_x_lines_authors = Math.floor(count_authors / 100)
-    let bar_author = new Progress(`Looping through authors [:bar] :percent :rate/s ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
-      complete: '=',
-      incomplete: ' ',
+    let bar_author = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
+      complete: chalk.bgGreen(' '),
+      incomplete: chalk.bgWhite(' '),
       width: 50,
       renderThrottle: 0,
       total: count_authors
@@ -125,9 +125,9 @@ class ProcessRelated {
     })
     console.log(`${count_subreddits} subreddits found ${chalk.yellowBright('start loop')}`)
     let update_every_x_lines_subreddits = Math.floor(count_subreddits / 100)
-    let bar_subreddit = new Progress(`Looping through subreddits [:bar] :percent :rate/s ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
-      complete: '=',
-      incomplete: ' ',
+    let bar_subreddit = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
+      complete: chalk.bgGreen(' '),
+      incomplete: chalk.bgWhite(' '),
       width: 50,
       renderThrottle: 0,
       total: count_subreddits

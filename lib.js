@@ -109,9 +109,9 @@ class Lib {
       this.getDirectoryNumLines(directory).then(number_of_lines => {
         console.log(`${number_of_lines} lines found ${chalk.yellowBright('start loading')}`)
         let update_every_x_lines = Math.floor(number_of_lines / 1000)
-        var bar = new Progress(`Loading [:bar] :percent :rate/s ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
-          complete: '=',
-          incomplete: ' ',
+        var bar = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
+          complete: chalk.bgGreen(' '),
+          incomplete: chalk.bgWhite(' '),
           width: 50,
           total: number_of_lines
         })
