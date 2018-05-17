@@ -37,6 +37,7 @@ class Lib {
       s3.createBucket(params, function(err, data) {
         if (err) reject(err)
         else resolve(params.Bucket)
+        console.log(`Created bucket ${chalk.greenBright(params.Bucket)}`)
       })
     })
   }
@@ -131,9 +132,11 @@ class Lib {
               .on('end', () => {
                 num_processing--
                 if (num_processing === 0) {
-                  bar.terminate()
-                  console.log(`Loaded ${number_of_lines} lines from ${files.length} files in ${chalk.greenBright(directory)}`)
-                  resolve()
+                  bar.update(number_of_lines, {memory: this.memoryUsed()})
+                  setTimeout(() => {
+                    console.log(`Loaded ${number_of_lines} lines from ${files.length} files in ${chalk.greenBright(directory)}`)
+                    resolve()
+                  }, 0)
                 }
               })
             })

@@ -116,7 +116,7 @@ class ProcessRelated {
         })
       })
     })
-    bar_author.terminate()
+    bar_author.update(count_authors, {memory: lib.memoryUsed()})
     console.log(`Done looping through authors ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
 
     let count_subreddits = 0
@@ -225,7 +225,7 @@ class ProcessRelated {
         json_output_chain[subreddit.nm].x_subs.rank_combined.push(xsub.rank_combined)
       })
     })
-    bar_subreddit.terminate()
+    bar_subreddit.update(count_subreddits, {memory: lib.memoryUsed()})
     console.log(`Done looping through subreddits ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
   }
 

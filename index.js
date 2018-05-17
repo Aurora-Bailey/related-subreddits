@@ -6,61 +6,60 @@ const chalk = require('chalk')
 const Progress = require('./progress')
 
 let json_output_chain = {}
-console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_related.js ${chalk.yellowBright('started')}`)
-related.start(json_output_chain).catch(err => {console.error(err)}).then(done => {
-  console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_related.js ${chalk.greenBright('done')}`)
-  console.log('')
+
+async function process () {
+  /*
+  *** Process related subreddits
+  */
+  console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_related.js ${chalk.yellowBright('started')}`)
+  await related.start(json_output_chain)
+
+  /*
+  *** Process products found in the comments
+  */
   console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_products.js ${chalk.yellowBright('started')}`)
-  products.start(json_output_chain).catch(err => {console.error(err)}).then(done => {
-    console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_products.js ${chalk.greenBright('done')}`)
-    console.log('')
-    console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_subreddit_about.js ${chalk.yellowBright('started')}`)
-    about.start(json_output_chain).catch(err => {console.error(err)}).then(done => {
-      console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_subreddit_about.js ${chalk.greenBright('done')}`)
-      console.log('')
-      console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} Uploading files to Amazon S3 ${chalk.yellowBright('started')}`)
+  await products.start(json_output_chain)
 
-      lib.createS3Bucket().catch(err => {console.error(err)}).then(bucket => {
-        console.log(`Created bucket ${chalk.greenBright(bucket)}`)
-        // upload subreddit index
-        let subredditList = Object.keys(json_output_chain)
-        subredditList.sort((a, b) => {
-          if (json_output_chain[a].subscribers === json_output_chain[b].subscribers) return 0
-          return json_output_chain[a].subscribers > json_output_chain[b].subscribers ? -1 : 1
-        })
-        console.log(`uploading ${chalk.yellowBright('index/subreddit_list.json')} start`)
-        lib.writeS3BucketGzip(bucket, 'index/subreddit_list.json', JSON.stringify({list: subredditList})).catch(err => {console.error(err)}).then(() => {
-          console.log(`upload ${chalk.greenBright('index/subreddit_list.json')} complete`)
-          // upload all subreddit data
-          console.log(`uploading ${chalk.yellowBright('index/subreddit_data.json')} start`)
-          lib.writeS3BucketGzip(bucket, 'index/subreddit_data.json', JSON.stringify(json_output_chain)).catch(err => {console.error(err)}).then(() => {
-            console.log(`upload ${chalk.greenBright('index/subreddit_data.json')} complete`)
-            console.log(`uploading ${chalk.yellowBright('data/subreddit.json')} start`)
-            // upload individual data files for each subreddit
-            let sent = Object.keys(json_output_chain).length
-            var bar = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.magentaBright('ETA(:etas)')}`, {
-              complete: chalk.bgGreen(' '),
-              incomplete: chalk.bgWhite(' '),
-              width: 50,
-              renderThrottle: 0,
-              total: Object.keys(json_output_chain).length
-            })
-            Object.keys(json_output_chain).forEach(key => {
-              lib.writeS3BucketGzip(bucket, 'data/' + key + '.json', JSON.stringify(json_output_chain[key])).catch(err => {console.error(err)}).then(() => {
-                sent--
-                bar.tick()
-                if (sent === 0) {
-                  bar.terminate()
-                  console.log(`upload ${chalk.greenBright('data/subreddit.json')} complete`)
-                  console.log(chalk.greenBright('Script is done!'))
-                }
-              })
-            })
-          })
-        })
+  /*
+  *** Process about.json files for each subreddit (add subreddit description / public_description)
+  */
+  console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_subreddit_about.js ${chalk.yellowBright('started')}`)
+  await about.start(json_output_chain)
 
+  /*
+  *** Upload files to AWS S3
+  */
+  console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} Uploading files to Amazon S3 ${chalk.yellowBright('started')}`)
+  // let bucket = await lib.createS3Bucket()
+  let bucket = 'related-subreddits-61141310'
 
-      })
-    })
+  // upload subreddit index
+  console.log(`uploading ${chalk.yellowBright('index/subreddit_list.json')} start`)
+  let subredditList = Object.keys(json_output_chain)
+  subredditList.sort((a, b) => {
+    if (json_output_chain[a].subscribers === json_output_chain[b].subscribers) return 0
+    return json_output_chain[a].subscribers > json_output_chain[b].subscribers ? -1 : 1
   })
-})
+  await lib.writeS3BucketGzip(bucket, 'index/subreddit_list.json', JSON.stringify({list: subredditList}))
+
+  // upload all subreddit data
+  console.log(`uploading ${chalk.yellowBright('index/subreddit_data.json')} start`)
+  await lib.writeS3BucketGzip(bucket, 'index/subreddit_data.json', JSON.stringify(json_output_chain))
+
+  // upload individual data files for each subreddit
+  console.log(`uploading ${chalk.yellowBright('data/{subreddit}.json')} start`)
+  let sent = Object.keys(json_output_chain).length
+  var bar = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.magentaBright('ETA(:etas)')}`,
+  { complete: chalk.bgGreen(' '), incomplete: chalk.bgWhite(' '), width: 50, renderThrottle: 0, total: Object.keys(json_output_chain).length })
+  for (var subreddit in json_output_chain) {
+    if (json_output_chain.hasOwnProperty(subreddit)) {
+      await lib.writeS3BucketGzip(bucket, 'data/' + subreddit + '.json', JSON.stringify(json_output_chain[subreddit]))
+      sent--
+      bar.tick()
+      if (sent === 0) {
+        console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} ${chalk.greenBright('Script is done!')}`)
+      }
+    }
+  }
+}
+process()
