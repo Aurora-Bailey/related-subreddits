@@ -6,6 +6,8 @@ class Config {
     this.number_of_x_subs_per_subreddit = 100
 
     this.number_of_products_per_subreddit = 10
+
+    this.upload_files_to_this_s3_bucket = "reddit.guide"
   }
 }
 module.exports = new Config()

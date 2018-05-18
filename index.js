@@ -1,4 +1,5 @@
 const lib = require('./lib')
+const config = require('./config')
 const related = require('./process_related')
 const products = require('./process_products')
 const about = require('./process_subreddit_about')
@@ -31,7 +32,7 @@ async function process () {
   */
   console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} Uploading files to Amazon S3 ${chalk.yellowBright('started')}`)
   // let bucket = await lib.createS3Bucket()
-  let bucket = 'related-subreddits-61141310'
+  let bucket = config.upload_files_to_this_s3_bucket
 
   // upload subreddit index
   console.log(`uploading ${chalk.yellowBright('index/subreddit_list.json')} start`)
