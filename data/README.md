@@ -3,37 +3,40 @@
 Download csv from AWS S3 (Oregon West)
 
 ```
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000000.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000001.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000002.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000003.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000004.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000005.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000006.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000007.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000008.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000009.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000010.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000011.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000012.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000013.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000014.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000015.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000016.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000017.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000018.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000019.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000020.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000021.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000022.csv"
-wget -P ./data/author_subreddits/ "https://s3-us-west-2.amazonaws.com/ngau/author_subreddits_all_000000000023.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000000.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000001.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000002.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000003.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000004.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000005.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000006.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000007.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000008.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000009.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000010.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000011.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000012.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000013.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000014.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000015.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000016.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000017.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000018.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000019.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000020.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000021.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000022.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000023.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000024.csv"
+wget -P ./data/author_subreddits/ "http://data.reddit.guide/author_subreddit_unique_2018_3_000000000025.csv"
 
-wget -P ./data/comments_with_product_links/ "https://s3-us-west-2.amazonaws.com/ngau/comments_with_product_links_detailed_000000000000.csv"
-wget -P ./data/comments_with_product_links/ "https://s3-us-west-2.amazonaws.com/ngau/comments_with_product_links_detailed_000000000001.csv"
-wget -P ./data/comments_with_product_links/ "https://s3-us-west-2.amazonaws.com/ngau/comments_with_product_links_detailed_000000000002.csv"
-wget -P ./data/comments_with_product_links/ "https://s3-us-west-2.amazonaws.com/ngau/comments_with_product_links_detailed_000000000003.csv"
-wget -P ./data/comments_with_product_links/ "https://s3-us-west-2.amazonaws.com/ngau/comments_with_product_links_detailed_000000000004.csv"
-wget -P ./data/comments_with_product_links/ "https://s3-us-west-2.amazonaws.com/ngau/comments_with_product_links_detailed_000000000005.csv"
+wget -P ./data/comments_with_product_links/ "http://data.reddit.guide/comments_with_products_2018_3_000000000000.csv"
+wget -P ./data/comments_with_product_links/ "http://data.reddit.guide/comments_with_products_2018_3_000000000001.csv"
+wget -P ./data/comments_with_product_links/ "http://data.reddit.guide/comments_with_products_2018_3_000000000002.csv"
+wget -P ./data/comments_with_product_links/ "http://data.reddit.guide/comments_with_products_2018_3_000000000003.csv"
+wget -P ./data/comments_with_product_links/ "http://data.reddit.guide/comments_with_products_2018_3_000000000004.csv"
+wget -P ./data/comments_with_product_links/ "http://data.reddit.guide/comments_with_products_2018_3_000000000005.csv"
+
 ```
 
 OR build a new one with [Google BigQuery reddit dataset](https://bigquery.cloud.google.com/table/fh-bigquery:reddit_comments.2015_05)
@@ -84,11 +87,14 @@ FROM [fh-bigquery:reddit_comments.2005],
 [fh-bigquery:reddit_comments.2017_09],
 [fh-bigquery:reddit_comments.2017_10],
 [fh-bigquery:reddit_comments.2017_11],
-[fh-bigquery:reddit_comments.2017_12]
+[fh-bigquery:reddit_comments.2017_12],
+[fh-bigquery:reddit_comments.2018_01],
+[fh-bigquery:reddit_comments.2018_02],
+[fh-bigquery:reddit_comments.2018_03]
 GROUP BY author, subreddit
 
 
-SELECT author, subreddit, created_utc, retrieved_on, gilded, score, body
+SELECT author, subreddit, created_utc, retrieved_on, score, subreddit_id, link_id, parent_id, id, body
 FROM [fh-bigquery:reddit_comments.2005],
 [fh-bigquery:reddit_comments.2006],
 [fh-bigquery:reddit_comments.2007],
@@ -136,7 +142,8 @@ FROM [fh-bigquery:reddit_comments.2005],
 [fh-bigquery:reddit_comments.2017_11],
 [fh-bigquery:reddit_comments.2017_12],
 [fh-bigquery:reddit_comments.2018_01],
-[fh-bigquery:reddit_comments.2018_02]
+[fh-bigquery:reddit_comments.2018_02],
+[fh-bigquery:reddit_comments.2018_03]
 WHERE (body LIKE '%.amazon.%'
 OR body like '%.amzn.%'
 OR body like '%.bestbuy.%'
