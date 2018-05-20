@@ -97,7 +97,8 @@ class ProcessProducts {
       json_output_chain[subreddit].products = {
         asin: [],
         name: [],
-        count: [],
+        s_count: [],
+        t_count: [],
         // last_comment: [],
         // first_comment: [],
         comment: [],
@@ -132,8 +133,8 @@ class ProcessProducts {
 
       // Sort array
       products_array.sort((a, b) => {
-        if (a.t_count == b.t_count) return 0 // total count
-        return a.t_count > b.t_count ? -1 : 1
+        if (a.s_count == b.s_count) return 0 // subreddit count
+        return a.s_count > b.s_count ? -1 : 1
       })
 
       // Write top results
@@ -141,7 +142,8 @@ class ProcessProducts {
         num_ads++
         json_output_chain[subreddit].products.asin.push(product.asin)
         json_output_chain[subreddit].products.name.push(product.name)
-        json_output_chain[subreddit].products.count.push(product.t_count) // total count
+        json_output_chain[subreddit].products.t_count.push(product.t_count) // total count
+        json_output_chain[subreddit].products.s_count.push(product.s_count) // subreddit count
         // json_output_chain[subreddit].products.last_comment.push(new Date(product.last_comment * 1000).toGMTString())
         // json_output_chain[subreddit].products.first_comment.push(new Date(product.first_comment * 1000).toGMTString())
         json_output_chain[subreddit].products.comment.push(sanitizeHtml(marked(product.comment)))
