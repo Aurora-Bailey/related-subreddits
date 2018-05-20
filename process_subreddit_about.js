@@ -3,18 +3,18 @@ const marked = require('marked')
 const rp = require('request-promise')
 const lib = require('./lib')
 const chalk = require('chalk')
+const sanitizeHtml = require('sanitize-html')
 const Progress = require('./progress')
 
 class ProcessSubredditAbout {
   constructor () {
-    this.data_directory = './data/author_subreddits/'
     this.subreddit_about_pages = {}
   }
 
   start (json_output_chain) {
     return new Promise((resolve, reject) => {
       console.log(`Downloading about page from s3 ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
-      lib.getS3ObjectGunzip('ngau', 'subreddit_about.json').catch(err => {console.error(err)}).then(data => {
+      lib.getS3ObjectGunzip('data.reddit.guide', 'subreddit_about.json').catch(err => {console.error(err)}).then(data => {
         console.log(`Loaded about page from s3 ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
         this.subreddit_about_pages = JSON.parse(data)
 
@@ -26,7 +26,7 @@ class ProcessSubredditAbout {
           console.log(`Loaded abbout pages from reddit ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
           if (subreddits_without_data_length > 0) {
             console.log('upload about file back to S3')
-            lib.writeS3BucketGzip('ngau', 'subreddit_about.json', JSON.stringify(this.subreddit_about_pages)).catch(err => {console.error(err)}).then(() => {
+            lib.writeS3BucketGzip('data.reddit.guide', 'subreddit_about.json', JSON.stringify(this.subreddit_about_pages)).catch(err => {console.error(err)}).then(() => {
               this.writeAbout(json_output_chain)
               resolve()
             })
@@ -49,8 +49,8 @@ class ProcessSubredditAbout {
       // json_output_chain[sub].banner_img = this.subreddit_about_pages[sub].banner_img || ''
       // json_output_chain[sub].header_img = this.subreddit_about_pages[sub].header_img || ''
       // json_output_chain[sub].icon_img = this.subreddit_about_pages[sub].icon_img || ''
-      // json_output_chain[sub].description = marked(this.subreddit_about_pages[sub].description)
-      json_output_chain[sub].public_description = marked(this.subreddit_about_pages[sub].public_description)
+      // json_output_chain[sub].description = sanitizeHtml(marked(this.subreddit_about_pages[sub].description))
+      json_output_chain[sub].public_description = sanitizeHtml(marked(this.subreddit_about_pages[sub].public_description))
       json_output_chain[sub].subscribers = this.subreddit_about_pages[sub].subscribers || 0
       json_output_chain[sub].accounts_active = this.subreddit_about_pages[sub].accounts_active || 0
       json_output_chain[sub].created_utc = this.subreddit_about_pages[sub].created_utc || 0
@@ -60,7 +60,7 @@ class ProcessSubredditAbout {
       json_output_chain[sub].x_subs.over18 = []
       json_output_chain[sub].x_subs.subreddits.forEach(subreddit => {
         if (typeof this.subreddit_about_pages[subreddit].public_description === 'undefined') this.subreddit_about_pages[subreddit].public_description = this.subreddit_about_pages[subreddit].error_message
-        json_output_chain[sub].x_subs.public_description.push(marked(this.subreddit_about_pages[subreddit].public_description))
+        json_output_chain[sub].x_subs.public_description.push(sanitizeHtml(marked(this.subreddit_about_pages[subreddit].public_description)))
         json_output_chain[sub].x_subs.subscribers.push(this.subreddit_about_pages[subreddit].subscribers || 0)
         json_output_chain[sub].x_subs.over18.push(this.subreddit_about_pages[subreddit].over18 || false)
       })
