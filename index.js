@@ -15,6 +15,7 @@ async function process () {
     */
     console.log(`${chalk.cyanBright(lib.memoryUsed())} ${chalk.magentaBright(lib.totaltime())} process_related.js ${chalk.yellowBright('started')}`)
     await related.start(json_output_chain)
+    console.log(Object.keys(json_output_chain).length, 'subreddits')
 
     /*
     *** Process products found in the comments
