@@ -227,6 +227,10 @@ class ProcessRelated {
     })
     bar_subreddit.update(count_subreddits, {memory: lib.memoryUsed()})
     console.log(`Done looping through subreddits ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
+    this.author_object = {}
+    this.author_array = {}
+    this.subreddit_object = {}
+    this.subreddit_array = {}
   }
 
   percent (small, big) {
