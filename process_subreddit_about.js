@@ -65,6 +65,7 @@ class ProcessSubredditAbout {
         json_output_chain[sub].x_subs.over18.push(this.subreddit_about_pages[subreddit].over18 || false)
       })
     })
+    this.subreddit_about_pages = {}
   }
 
   subredditsNotInData (json_output_chain) {

@@ -154,6 +154,8 @@ class ProcessProducts {
       })
     })
     console.log(`${num_ads} ads found`)
+    this.subreddits_object = {}
+    this.products_object = {}
   }
 }
 

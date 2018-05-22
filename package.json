@@ -4,7 +4,7 @@
   "description": "\"# related-subreddits\"",
   "main": "index.js",
   "scripts": {
-    "start": "node --max-old-space-size=1048576 index",
+    "start": "node --max-old-space-size=65536 index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

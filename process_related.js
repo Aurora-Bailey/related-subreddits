@@ -45,7 +45,7 @@ class ProcessRelated {
       }
 
       if (typeof this.author_object[a_c][author] !== 'object') {
-        this.author_object[a_c][author] = {sub: []}
+        this.author_object[a_c][author] = {n: author, sub: []}
         this.author_array[a_c].push(this.author_object[a_c][author])
       }
 
@@ -73,13 +73,40 @@ class ProcessRelated {
     })
   }
 
-  writeSubreddits (json_output_chain) {
+  ripThroughSubredditsArray (processFunction) {
+    // { nm: 'SaintPoitiersbourg', cmt: 2 }
+    Object.keys(this.subreddit_array).forEach(letter => {
+      while (this.subreddit_array[letter].length > 0) {
+        let subreddit = this.subreddit_array[letter].pop()
+        processFunction(subreddit)
+        delete this.subreddit_object[letter][subreddit.nm]
+      }
+    })
+  }
 
-    // let stream = process.stderr
+  ripThroughAuthorsArray (processFunction) {
+    // { sub: [ { nm: 'nanaimo', cmt: 65 }, {...} ] }
+    Object.keys(this.author_array).forEach(letter => {
+      while (this.author_array[letter].length > 0) {
+        let author = this.author_array[letter].pop()
+        processFunction(author)
+        delete this.author_object[letter][author.n]
+      }
+    })
+  }
+
+  writeSubreddits (json_output_chain) {
+  // Count
     let count_authors = 0
     this.loopThroughAuthorsArray(author => {
       count_authors++
     })
+    let count_subreddits = 0
+    this.loopThroughSubredditsArray(subreddit => {
+      count_subreddits++
+    })
+
+    // Loop throuth authors
     console.log(`${count_authors} authors found ${chalk.yellowBright('start loop')}`)
     let update_every_x_lines_authors = Math.floor(count_authors / 1000)
     let bar_author = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
@@ -92,7 +119,7 @@ class ProcessRelated {
     bar_author.tick(1, {memory: lib.memoryUsed()})
 
     let count_author_loops = 0
-    this.loopThroughAuthorsArray(author => {
+    this.ripThroughAuthorsArray(author => {
       // update bar
       count_author_loops++
       if (count_author_loops % update_every_x_lines_authors === 0) bar_author.tick(update_every_x_lines_authors, {memory: lib.memoryUsed()})
@@ -118,11 +145,10 @@ class ProcessRelated {
     })
     bar_author.update(count_authors, {memory: lib.memoryUsed()})
     console.log(`Done looping through authors ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
+    this.author_object = {}
+    this.author_array = {}
 
-    let count_subreddits = 0
-    this.loopThroughSubredditsArray(subreddit => {
-      count_subreddits++
-    })
+    // Loop through subreddits
     console.log(`${count_subreddits} subreddits found ${chalk.yellowBright('start loop')}`)
     let update_every_x_lines_subreddits = Math.floor(count_subreddits / 1000)
     let bar_subreddit = new Progress(` :bar ${chalk.greenBright(':percent')} ${chalk.cyanBright('Memory(:memory)')} ${chalk.magentaBright('ETA(:etas)')}`, {
@@ -135,7 +161,7 @@ class ProcessRelated {
     bar_subreddit.tick(1, {memory: lib.memoryUsed()})
 
     let count_subreddit_loops = 0
-    this.loopThroughSubredditsArray(subreddit => {
+    this.ripThroughSubredditsArray(subreddit => {
       // update bar
       count_subreddit_loops++
       if (count_subreddit_loops % update_every_x_lines_subreddits === 0) bar_subreddit.tick(update_every_x_lines_subreddits, {memory: lib.memoryUsed()})
@@ -227,8 +253,6 @@ class ProcessRelated {
     })
     bar_subreddit.update(count_subreddits, {memory: lib.memoryUsed()})
     console.log(`Done looping through subreddits ${chalk.cyanBright(lib.memoryUsed())} ${chalk.redBright(lib.stopwatch())}`)
-    this.author_object = {}
-    this.author_array = {}
     this.subreddit_object = {}
     this.subreddit_array = {}
   }
