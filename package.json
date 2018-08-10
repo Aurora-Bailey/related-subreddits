@@ -18,13 +18,13 @@
   },
   "homepage": "https://github.com/gbradthompson/related-subreddits#readme",
   "dependencies": {
-    "aws-sdk": "^2.239.1",
+    "aws-sdk": "^2.289.0",
     "chalk": "^2.4.1",
     "csv-parser": "^1.12.1",
     "marked": "^0.3.19",
     "progress": "^2.0.0",
-    "request": "^2.85.0",
+    "request": "^2.87.0",
     "request-promise": "^4.2.2",
-    "sanitize-html": "^1.18.2"
+    "sanitize-html": "^1.18.4"
   }
 }
